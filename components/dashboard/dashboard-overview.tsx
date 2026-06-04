@@ -36,9 +36,9 @@ export function DashboardOverview() {
             transition={{ duration: 0.35, delay: index * 0.08 }}
           >
             <Card className="overflow-hidden">
-              <div className="text-sm text-zinc-500">{stat.label}</div>
+              <div className="text-sm text-[var(--text-tertiary)]">{stat.label}</div>
               <div className="mt-5 flex items-end justify-between gap-3">
-                <div className="text-3xl font-semibold text-white">{stat.value}</div>
+                <div className="text-3xl font-semibold text-[var(--heading)]">{stat.value}</div>
                 <Badge variant={stat.delta.startsWith("-") ? "warning" : "success"}>
                   {stat.delta}
                 </Badge>
@@ -79,9 +79,9 @@ export function DashboardOverview() {
               <CardDescription>Projects, payments, and delivery confidence in one table.</CardDescription>
             </div>
           </CardHeader>
-          <div className="overflow-hidden rounded-[22px] border border-white/8">
+          <div className="overflow-x-auto rounded-[22px] border border-[var(--card-inner-border)]">
             <table className="w-full text-left text-sm">
-              <thead className="bg-white/5 text-zinc-300">
+              <thead className="bg-[var(--table-header-bg)] text-[var(--text-secondary)]">
                 <tr>
                   {["Client", "Project", "Stage", "Payment", "Performance"].map((item) => (
                     <th key={item} className="px-4 py-3 font-medium">
@@ -92,8 +92,8 @@ export function DashboardOverview() {
               </thead>
               <tbody>
                 {clientTable.map((client) => (
-                  <tr key={client.name} className="border-t border-white/8 text-zinc-400">
-                    <td className="px-4 py-4 text-white">{client.name}</td>
+                  <tr key={client.name} className="border-t border-[var(--card-inner-border)] text-[var(--text-secondary)]">
+                    <td className="px-4 py-4 text-[var(--heading)]">{client.name}</td>
                     <td className="px-4 py-4">{client.project}</td>
                     <td className="px-4 py-4">{client.stage}</td>
                     <td className="px-4 py-4">{client.payment}</td>
@@ -113,13 +113,13 @@ export function DashboardOverview() {
           </CardHeader>
           <div className="space-y-4">
             {activities.map((item) => (
-              <div key={item.title} className="rounded-[22px] border border-white/8 bg-white/5 p-4">
+              <div key={item.title} className="rounded-[22px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-medium text-white">{item.title}</p>
-                    <p className="mt-2 text-sm leading-6 text-zinc-400">{item.detail}</p>
+                    <p className="font-medium text-[var(--heading)]">{item.title}</p>
+                    <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{item.detail}</p>
                   </div>
-                  <span className="text-xs uppercase tracking-[0.2em] text-zinc-500">
+                  <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
                     {item.time}
                   </span>
                 </div>
@@ -133,8 +133,8 @@ export function DashboardOverview() {
         <Card className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-xl font-semibold text-white">Task board</h3>
-              <p className="text-sm text-zinc-400">Drag-style workflow movement with local persistence.</p>
+              <h3 className="text-xl font-semibold text-[var(--heading)]">Task board</h3>
+              <p className="text-sm text-[var(--text-secondary)]">Drag-style workflow movement with local persistence.</p>
             </div>
             <Badge variant="violet">Sprint</Badge>
           </div>
@@ -149,9 +149,9 @@ export function DashboardOverview() {
               </div>
               <CalendarDays className="size-5 text-cyan-200" />
             </CardHeader>
-            <div className="grid grid-cols-7 gap-2 text-center text-xs text-zinc-500">
-              {["M", "T", "W", "T", "F", "S", "S"].map((day) => (
-                <div key={day} className="py-2">
+            <div className="grid grid-cols-7 gap-2 text-center text-xs text-[var(--text-tertiary)]">
+              {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => (
+                <div key={`day-${index}`} className="py-2">
                   {day}
                 </div>
               ))}
@@ -162,8 +162,8 @@ export function DashboardOverview() {
                     key={index}
                     className={`rounded-2xl border px-2 py-3 ${
                       active
-                        ? "border-cyan-400/25 bg-cyan-400/12 text-cyan-100"
-                        : "border-white/6 bg-white/4 text-zinc-300"
+                        ? "border-cyan-400/25 bg-cyan-400/12 text-cyan-500 dark:text-cyan-100"
+                        : "border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] text-[var(--text-secondary)]"
                     }`}
                   >
                     {index + 1}
@@ -183,15 +183,15 @@ export function DashboardOverview() {
               {billingRows.slice(0, 3).map((row) => (
                 <div
                   key={row.invoice}
-                  className="flex items-center justify-between rounded-[22px] border border-white/8 bg-white/5 px-4 py-3"
+                  className="flex items-center justify-between rounded-[22px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] px-4 py-3"
                 >
                   <div>
-                    <p className="font-medium text-white">{row.invoice}</p>
-                    <p className="text-xs text-zinc-500">{row.date}</p>
+                    <p className="font-medium text-[var(--heading)]">{row.invoice}</p>
+                    <p className="text-xs text-[var(--text-tertiary)]">{row.date}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-white">{row.amount}</p>
-                    <p className="text-xs text-zinc-500">{row.status}</p>
+                    <p className="text-sm text-[var(--heading)]">{row.amount}</p>
+                    <p className="text-xs text-[var(--text-tertiary)]">{row.status}</p>
                   </div>
                 </div>
               ))}
@@ -208,13 +208,13 @@ export function DashboardOverview() {
               {teamMembers.slice(0, 3).map((member) => (
                 <div
                   key={member.name}
-                  className="flex items-center justify-between rounded-[22px] border border-white/8 bg-white/5 px-4 py-3"
+                  className="flex items-center justify-between rounded-[22px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] px-4 py-3"
                 >
                   <div>
-                    <p className="font-medium text-white">{member.name}</p>
-                    <p className="text-xs text-zinc-500">{member.role}</p>
+                    <p className="font-medium text-[var(--heading)]">{member.name}</p>
+                    <p className="text-xs text-[var(--text-tertiary)]">{member.role}</p>
                   </div>
-                  <CheckCircle2 className="size-4 text-emerald-300" />
+                  <CheckCircle2 className="size-4 text-emerald-500 dark:text-emerald-300" />
                 </div>
               ))}
             </div>
@@ -225,12 +225,12 @@ export function DashboardOverview() {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (
           <Card key={card.title} className="space-y-4">
-            <card.icon className="size-5 text-cyan-200" />
+            <card.icon className="size-5 text-cyan-500 dark:text-cyan-200" />
             <div>
-              <h3 className="text-lg font-semibold text-white">{card.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-zinc-400">{card.description}</p>
+              <h3 className="text-lg font-semibold text-[var(--heading)]">{card.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{card.description}</p>
             </div>
-            <div className="h-2 rounded-full bg-white/8">
+            <div className="h-2 rounded-full bg-[var(--card-inner-bg)]">
               <div
                 className="h-full rounded-full bg-[linear-gradient(90deg,#5b8cff,#33d1ff)]"
                 style={{

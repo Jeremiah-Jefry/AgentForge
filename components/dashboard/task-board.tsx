@@ -40,8 +40,8 @@ export function TaskBoard() {
         <Card key={column.key} className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-lg font-semibold text-white">{column.label}</p>
-              <p className="text-sm text-zinc-500">
+              <p className="text-lg font-semibold text-[var(--heading)]">{column.label}</p>
+              <p className="text-sm text-[var(--text-tertiary)]">
                 {tasks.filter((task) => task.column === column.key).length} tasks
               </p>
             </div>
@@ -55,16 +55,16 @@ export function TaskBoard() {
                   key={task.id}
                   layout
                   whileHover={{ y: -4 }}
-                  className="cursor-grab rounded-[24px] border border-white/10 bg-white/5 p-4"
+                  className="cursor-grab rounded-[24px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] p-4"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="font-medium text-white">{task.title}</p>
-                      <p className="mt-2 text-sm text-zinc-400">
+                      <p className="font-medium text-[var(--heading)]">{task.title}</p>
+                      <p className="mt-2 text-sm text-[var(--text-secondary)]">
                         Owner: {task.owner} · Due {task.due}
                       </p>
                     </div>
-                    <ArrowLeftRight className="size-4 text-zinc-500" />
+                    <ArrowLeftRight className="size-4 text-[var(--text-tertiary)]" />
                   </div>
                   <div className="mt-4 flex items-center justify-between">
                     <button
@@ -72,7 +72,7 @@ export function TaskBoard() {
                       aria-label={`Move ${task.title} to the previous column`}
                       onClick={() => moveTask(task, "left")}
                       disabled={task.column === "todo"}
-                      className="inline-flex items-center gap-2 text-xs text-zinc-400 disabled:opacity-30"
+                      className="inline-flex items-center gap-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition disabled:opacity-30 disabled:hover:text-[var(--text-secondary)]"
                     >
                       <MoveLeft className="size-3.5" />
                       Move left
@@ -82,7 +82,7 @@ export function TaskBoard() {
                       aria-label={`Move ${task.title} to the next column`}
                       onClick={() => moveTask(task, "right")}
                       disabled={task.column === "done"}
-                      className="inline-flex items-center gap-2 text-xs text-zinc-400 disabled:opacity-30"
+                      className="inline-flex items-center gap-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition disabled:opacity-30 disabled:hover:text-[var(--text-secondary)]"
                     >
                       Move right
                       <MoveRight className="size-3.5" />

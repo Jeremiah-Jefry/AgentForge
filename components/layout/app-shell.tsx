@@ -25,10 +25,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/60 p-4 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-50 p-4 backdrop-blur-sm lg:hidden"
+              style={{ background: "var(--overlay-bg)" }}
               onClick={() => setSidebarOpen(false)}
             >
-              <div onClick={(event) => event.stopPropagation()}>
+              <div className="max-h-screen overflow-y-auto" onClick={(event) => event.stopPropagation()}>
                 <Sidebar mobile />
               </div>
             </motion.div>
@@ -39,7 +40,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
               <Menu className="size-4" />
             </Button>
-            <p className="text-xs uppercase tracking-[0.35em] text-zinc-500">VEXORIUM</p>
+            <p className="text-xs uppercase tracking-[0.35em] text-[var(--text-tertiary)]">VEXORIUM</p>
           </div>
           <Topbar />
           {children}

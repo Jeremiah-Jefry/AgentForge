@@ -16,17 +16,17 @@ export function Sidebar({ mobile = false }: { mobile?: boolean }) {
   const { setSidebarOpen } = useWorkspace();
 
   const content = (
-    <div className="flex h-full flex-col gap-8 rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.11),rgba(255,255,255,0.03))] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.32)] backdrop-blur-2xl">
+    <div className="flex h-full flex-col gap-8 rounded-[28px] border border-[var(--border)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.32)] backdrop-blur-2xl" style={{ background: "var(--sidebar-gradient)" }}>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-zinc-500">VEXORIUM</p>
-          <h2 className="mt-2 text-lg font-semibold text-white">Agency OS</h2>
+          <p className="text-xs uppercase tracking-[0.35em] text-[var(--text-tertiary)]">VEXORIUM</p>
+          <h2 className="mt-2 text-lg font-semibold text-[var(--heading)]">Agency OS</h2>
         </div>
         {mobile ? (
           <button
             type="button"
             onClick={() => setSidebarOpen(false)}
-            className="rounded-2xl border border-white/10 p-2 text-zinc-300"
+            className="rounded-2xl border border-[var(--card-inner-border)] p-2 text-[var(--text-secondary)]"
           >
             <X className="size-4" />
           </button>
@@ -44,9 +44,10 @@ export function Sidebar({ mobile = false }: { mobile?: boolean }) {
               className={cn(
                 "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm transition duration-300",
                 active
-                  ? "bg-[linear-gradient(135deg,rgba(78,107,255,0.35),rgba(154,124,255,0.25))] text-white shadow-[0_18px_40px_rgba(78,107,255,0.2)]"
-                  : "text-zinc-400 hover:bg-white/6 hover:text-white",
+                  ? "text-white shadow-[0_18px_40px_rgba(78,107,255,0.2)]"
+                  : "text-[var(--text-secondary)] hover:bg-[var(--card-inner-bg)] hover:text-[var(--heading)]",
               )}
+              style={active ? { background: "var(--active-nav-bg)" } : undefined}
               onClick={() => setSidebarOpen(false)}
             >
               <Icon className="size-4" />
@@ -58,7 +59,7 @@ export function Sidebar({ mobile = false }: { mobile?: boolean }) {
 
       <div className="mt-auto rounded-[24px] border border-cyan-400/15 bg-cyan-400/10 p-4">
         <p className="text-xs uppercase tracking-[0.22em] text-cyan-200">Automation</p>
-        <p className="mt-3 text-sm leading-6 text-zinc-200">
+        <p className="mt-3 text-sm leading-6 text-[var(--text-primary)]">
           8 overdue reminders and 3 billing nudges scheduled for today.
         </p>
       </div>

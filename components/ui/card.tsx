@@ -10,7 +10,7 @@ export function Card({
     <div
       data-slot="card"
       className={cn(
-        "rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04))] p-6 shadow-[0_24px_90px_rgba(0,0,0,0.35)] backdrop-blur-2xl",
+        "rounded-[28px] border border-[var(--border)] bg-[var(--panel)] p-6 shadow-[0_24px_90px_rgba(0,0,0,0.35)] backdrop-blur-2xl",
         className,
       )}
       {...props}
@@ -32,7 +32,7 @@ export function CardTitle({
   ...props
 }: React.ComponentProps<"h3">) {
   return (
-    <h3 className={cn("text-lg font-semibold tracking-tight text-white", className)} {...props} />
+    <h3 className={cn("text-lg font-semibold tracking-tight text-[var(--heading)]", className)} {...props} />
   );
 }
 
@@ -41,7 +41,7 @@ export function CardDescription({
   ...props
 }: React.ComponentProps<"p">) {
   return (
-    <p className={cn("text-sm leading-6 text-zinc-400", className)} {...props} />
+    <p className={cn("text-sm leading-6 text-[var(--text-secondary)]", className)} {...props} />
   );
 }
 

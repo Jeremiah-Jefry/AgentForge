@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function RevenueChart() {
   const mounted = useSyncExternalStore(
-    () => () => undefined,
+    () => () => {},
     () => true,
     () => false,
   );

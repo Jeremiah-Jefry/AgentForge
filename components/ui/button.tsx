@@ -9,13 +9,13 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border-white/15 bg-[linear-gradient(135deg,rgba(91,140,255,0.45),rgba(154,124,255,0.35))] text-white shadow-[0_12px_40px_rgba(78,107,255,0.22)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(78,107,255,0.32)]",
+          "border-[var(--border)] bg-[linear-gradient(135deg,rgba(91,140,255,0.45),rgba(154,124,255,0.35))] text-white shadow-[0_12px_40px_rgba(78,107,255,0.22)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(78,107,255,0.32)]",
         ghost:
-          "border-white/10 bg-white/5 text-zinc-100 hover:-translate-y-0.5 hover:border-cyan-400/40 hover:bg-white/10",
+          "border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] text-[var(--heading)] hover:-translate-y-0.5 hover:border-cyan-400/40 hover:bg-cyan-400/10",
         secondary:
           "border-cyan-400/20 bg-cyan-400/10 text-cyan-100 hover:bg-cyan-400/15",
         outline:
-          "border-white/15 bg-transparent text-zinc-100 hover:border-violet-400/35 hover:bg-violet-400/10",
+          "border-[var(--border)] bg-transparent text-[var(--heading)] hover:border-violet-400/35 hover:bg-violet-400/10",
       },
       size: {
         default: "h-11 px-5 py-2",

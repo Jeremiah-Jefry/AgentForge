@@ -11,6 +11,37 @@
   --violet: #9a7cff;
   --emerald: #6dffbf;
   --amber: #ffbc4e;
+
+  /* Theme-aware text hierarchy */
+  --heading: #ffffff;
+  --text-primary: #f5f7ff;
+  --text-secondary: #9ea3b7;
+  --text-tertiary: #6b7084;
+
+  /* Theme-aware surfaces */
+  --card-inner-bg: rgba(255, 255, 255, 0.05);
+  --card-inner-border: rgba(255, 255, 255, 0.08);
+  --table-header-bg: rgba(255, 255, 255, 0.05);
+
+  /* Theme-aware overlays */
+  --overlay-bg: rgba(0, 0, 0, 0.65);
+  --modal-bg: rgba(12, 12, 14, 0.96);
+  --dropdown-bg: rgba(10, 10, 10, 0.92);
+  --tooltip-bg: rgba(10, 10, 10, 0.96);
+  --tooltip-border: rgba(255, 255, 255, 0.08);
+  --nav-header-bg: rgba(10, 10, 12, 0.7);
+
+  /* Theme-aware component surfaces */
+  --topbar-gradient: linear-gradient(180deg, rgba(255,255,255,0.11), rgba(255,255,255,0.03));
+  --sidebar-gradient: linear-gradient(180deg, rgba(255,255,255,0.11), rgba(255,255,255,0.03));
+  --active-nav-bg: linear-gradient(135deg, rgba(78,107,255,0.35), rgba(154,124,255,0.25));
+
+  /* Grid and chart colors */
+  --grid-stroke: rgba(255, 255, 255, 0.06);
+  --axis-stroke: rgba(255, 255, 255, 0.4);
+
+  /* Scrollbar */
+  --scrollbar-thumb: rgba(255, 255, 255, 0.12);
 }
 
 @theme inline {
@@ -42,11 +73,49 @@ body {
 }
 
 .light {
+  color-scheme: light;
+
   --background: #f5f7fb;
   --foreground: #101114;
   --muted: #5f6678;
   --panel: rgba(255, 255, 255, 0.78);
-  --border: rgba(16, 17, 20, 0.08);
+  --border: rgba(16, 17, 20, 0.10);
+
+  --heading: #101114;
+  --text-primary: #1a1c22;
+  --text-secondary: #5f6678;
+  --text-tertiary: #8189a0;
+
+  --card-inner-bg: rgba(16, 17, 20, 0.035);
+  --card-inner-border: rgba(16, 17, 20, 0.08);
+  --table-header-bg: rgba(16, 17, 20, 0.04);
+
+  --overlay-bg: rgba(0, 0, 0, 0.25);
+  --modal-bg: rgba(255, 255, 255, 0.97);
+  --dropdown-bg: rgba(255, 255, 255, 0.97);
+  --tooltip-bg: rgba(255, 255, 255, 0.97);
+  --tooltip-border: rgba(16, 17, 20, 0.10);
+  --nav-header-bg: rgba(255, 255, 255, 0.85);
+
+  --topbar-gradient: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.75));
+  --sidebar-gradient: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.75));
+  --active-nav-bg: linear-gradient(135deg, rgba(78,107,255,0.15), rgba(154,124,255,0.10));
+
+  --grid-stroke: rgba(16, 17, 20, 0.08);
+  --axis-stroke: rgba(16, 17, 20, 0.4);
+
+  --scrollbar-thumb: rgba(16, 17, 20, 0.12);
+}
+
+.light body,
+html.light body {
+  background: var(--background);
+  color: var(--foreground);
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(78, 107, 255, 0.08), transparent 35%),
+    radial-gradient(circle at 90% 8%, rgba(154, 124, 255, 0.06), transparent 32%),
+    radial-gradient(circle at 50% 95%, rgba(51, 209, 255, 0.04), transparent 38%),
+    linear-gradient(165deg, #f5f7fb, #eef1f8 45%, #e8ecf4);
 }
 
 body::before {
@@ -61,6 +130,13 @@ body::before {
   background-size: 56px 56px;
   -webkit-mask-image: radial-gradient(circle at center, black 65%, transparent 100%);
   mask-image: radial-gradient(circle at center, black 65%, transparent 100%);
+}
+
+.light body::before,
+html.light body::before {
+  background-image:
+    linear-gradient(rgba(16, 17, 20, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 17, 20, 0.04) 1px, transparent 1px);
 }
 
 main,
@@ -83,19 +159,30 @@ input {
 
 ::selection {
   background: rgba(51, 209, 255, 0.28);
-  color: white;
+  color: var(--heading);
 }
 
 .glass-border {
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--border);
 }
 
 .glow-ring {
   box-shadow: 0 0 0 1px rgba(51, 209, 255, 0.18), 0 0 30px rgba(51, 209, 255, 0.14);
 }
 
+.light .glow-ring {
+  box-shadow: 0 0 0 1px rgba(51, 209, 255, 0.12), 0 0 20px rgba(51, 209, 255, 0.08);
+}
+
 .text-gradient {
   background: linear-gradient(135deg, #fff 10%, #8db7ff 45%, #b99cff 80%, #7ef0ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.light .text-gradient {
+  background: linear-gradient(135deg, #1a1c22 10%, #3a5dd4 45%, #7a5fd4 80%, #1e99b8 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -106,10 +193,15 @@ input {
 }
 
 .dashboard-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--scrollbar-thumb);
   border-radius: 999px;
 }
 
 .dashboard-scroll::-webkit-scrollbar-track {
   background: transparent;
+}
+
+/* Light mode particle field opacity reduction */
+.light .particle-field-dot {
+  opacity: 0.15;
 }

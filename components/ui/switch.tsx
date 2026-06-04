@@ -19,13 +19,15 @@ export function Switch({
         "relative inline-flex h-7 w-12 items-center rounded-full border transition duration-300",
         checked
           ? "border-cyan-400/30 bg-cyan-400/20"
-          : "border-white/10 bg-white/6",
+          : "border-[var(--card-inner-border)] bg-[var(--card-inner-bg)]",
       )}
     >
       <span
         className={cn(
-          "block size-5 rounded-full bg-white shadow transition duration-300",
-          checked ? "translate-x-6" : "translate-x-1",
+          "block size-5 rounded-full shadow transition duration-300",
+          checked
+            ? "translate-x-6 bg-white"
+            : "translate-x-1 bg-[var(--text-secondary)]",
         )}
       />
     </button>
