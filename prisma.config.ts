@@ -4,7 +4,7 @@ import { defineConfig } from "prisma/config";
 export default defineConfig({
   earlyAccess: true,
   schema: path.join("prisma", "schema.prisma"),
-  migrate: {
+  migrations: {
     async adapter() {
       const { PrismaBetterSQLite } = await import("@prisma/adapter-better-sqlite3");
       return new PrismaBetterSQLite({ url: "file:prisma/dev.db" });
