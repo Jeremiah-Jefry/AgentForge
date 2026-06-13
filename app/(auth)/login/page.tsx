@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
 
 import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
@@ -22,14 +24,43 @@ const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push("/dashboard");
+    setLoading(true);
+    setError("");
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("Invalid email or password. Try alex@vexorium.com / password123");
+        toast("Login failed. Please check your credentials.", "error");
+      } else {
+        toast("Welcome back!", "success");
+        router.push("/dashboard");
+        router.refresh();
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+      toast("An unexpected error occurred.", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOAuth = () => {
-    toast("OAuth sign-in coming soon", "info");
+    toast("OAuth providers require API keys. Configure in production.", "info");
   };
 
   return (
@@ -46,11 +77,16 @@ export default function LoginPage() {
       }
     >
       <form onSubmit={handleLogin} className="space-y-4">
+        {error ? (
+          <div className="rounded-xl border border-red-400/25 bg-red-400/8 px-4 py-3 text-sm text-red-400">
+            {error}
+          </div>
+        ) : null}
         <div className="space-y-2">
           <label className="text-sm font-medium text-[var(--heading)]" htmlFor="email">
             Email
           </label>
-          <Input id="email" type="email" placeholder="name@agency.com" required />
+          <Input id="email" name="email" type="email" placeholder="alex@vexorium.com" required />
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
@@ -64,10 +100,10 @@ export default function LoginPage() {
               Forgot password?
             </Link>
           </div>
-          <Input id="password" type="password" required />
+          <Input id="password" name="password" type="password" placeholder="password123" required />
         </div>
-        <Button className="w-full" type="submit">
-          Login
+        <Button className="w-full" type="submit" disabled={loading}>
+          {loading ? "Signing in..." : "Login"}
         </Button>
       </form>
 

@@ -33,7 +33,7 @@ import {
   navItems,
   pricingPlans,
   revenueSeries,
-} from "@/data/mock-data";
+} from "@/data/static-data";
 
 export function LandingPage() {
   const [mobileOpen, setMobileOpen] = useState(false);

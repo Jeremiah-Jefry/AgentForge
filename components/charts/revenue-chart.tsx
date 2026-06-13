@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 
-import { revenueSeries } from "@/data/mock-data";
+import { useRevenueSeries } from "@/hooks/use-dashboard";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function RevenueChart() {
@@ -13,13 +13,15 @@ export function RevenueChart() {
     () => false,
   );
 
-  if (!mounted) {
+  const { data: revenueSeries, isLoading } = useRevenueSeries();
+
+  if (!mounted || isLoading) {
     return <Skeleton className="h-72 w-full rounded-[24px]" />;
   }
 
   return (
     <div className="h-72 w-full">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="100%" minHeight={0} minWidth={0}>
         <AreaChart data={revenueSeries}>
           <defs>
             <linearGradient id="revenue" x1="0" x2="0" y1="0" y2="1">

@@ -3,18 +3,21 @@
 import { ArrowLeftRight, MoveLeft, MoveRight } from "lucide-react";
 import { motion } from "framer-motion";
 
-import { useWorkspace, type BoardColumn, type TaskItem } from "@/components/providers/workspace-provider";
+import { useTasks, useMoveTask } from "@/hooks/use-tasks";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+
+type BoardColumn = "TODO" | "PROGRESS" | "DONE";
 
 const columns: { key: BoardColumn; label: string }[] = [
-  { key: "todo", label: "To do" },
-  { key: "progress", label: "In progress" },
-  { key: "done", label: "Completed" },
+  { key: "TODO", label: "To do" },
+  { key: "PROGRESS", label: "In progress" },
+  { key: "DONE", label: "Completed" },
 ];
 
-function nextColumn(column: BoardColumn, direction: "left" | "right"): BoardColumn {
-  const order: BoardColumn[] = ["todo", "progress", "done"];
+function nextColumn(column: string, direction: "left" | "right"): string {
+  const order: string[] = ["TODO", "PROGRESS", "DONE"];
   const index = order.indexOf(column);
   const target =
     direction === "left"
@@ -24,15 +27,25 @@ function nextColumn(column: BoardColumn, direction: "left" | "right"): BoardColu
 }
 
 export function TaskBoard() {
-  const { tasks, setTasks } = useWorkspace();
+  const { data: tasks, isLoading } = useTasks();
+  const moveTask = useMoveTask();
 
-  const moveTask = (task: TaskItem, direction: "left" | "right") => {
-    setTasks((current) =>
-      current.map((item) =>
-        item.id === task.id ? { ...item, column: nextColumn(item.column, direction) } : item,
-      ),
-    );
+  const handleMoveTask = (taskId: string, taskColumn: string, direction: "left" | "right") => {
+    const newColumn = nextColumn(taskColumn, direction);
+    if (newColumn !== taskColumn) {
+      moveTask.mutate({ id: taskId, column: newColumn });
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 xl:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Skeleton key={i} className="h-[200px] w-full rounded-[28px]" />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-4 xl:grid-cols-3">
@@ -42,14 +55,14 @@ export function TaskBoard() {
             <div>
               <p className="text-lg font-semibold text-[var(--heading)]">{column.label}</p>
               <p className="text-sm text-[var(--text-tertiary)]">
-                {tasks.filter((task) => task.column === column.key).length} tasks
+                {tasks?.filter((task) => task.column === column.key).length ?? 0} tasks
               </p>
             </div>
             <Badge variant={columnIndex === 1 ? "violet" : "default"}>{column.label}</Badge>
           </div>
           <div className="space-y-3">
             {tasks
-              .filter((task) => task.column === column.key)
+              ?.filter((task) => task.column === column.key)
               .map((task) => (
                 <motion.div
                   key={task.id}
@@ -70,8 +83,8 @@ export function TaskBoard() {
                     <button
                       type="button"
                       aria-label={`Move ${task.title} to the previous column`}
-                      onClick={() => moveTask(task, "left")}
-                      disabled={task.column === "todo"}
+                      onClick={() => handleMoveTask(task.id, task.column, "left")}
+                      disabled={task.column === "TODO"}
                       className="inline-flex items-center gap-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition disabled:opacity-30 disabled:hover:text-[var(--text-secondary)]"
                     >
                       <MoveLeft className="size-3.5" />
@@ -80,8 +93,8 @@ export function TaskBoard() {
                     <button
                       type="button"
                       aria-label={`Move ${task.title} to the next column`}
-                      onClick={() => moveTask(task, "right")}
-                      disabled={task.column === "done"}
+                      onClick={() => handleMoveTask(task.id, task.column, "right")}
+                      disabled={task.column === "DONE"}
                       className="inline-flex items-center gap-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition disabled:opacity-30 disabled:hover:text-[var(--text-secondary)]"
                     >
                       Move right

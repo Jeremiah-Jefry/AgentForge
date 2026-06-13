@@ -6,11 +6,13 @@ import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/toast";
-import { billingRows } from "@/data/mock-data";
+import { useInvoices } from "@/hooks/use-invoices";
 
 export default function BillingPage() {
   const { toast } = useToast();
+  const { data: invoices, isLoading } = useInvoices();
 
   return (
     <div className="space-y-6 pb-6">
@@ -58,34 +60,44 @@ export default function BillingPage() {
               </div>
             </CardHeader>
             <div className="space-y-3">
-              {billingRows.map((row, index) => (
-                <motion.div
-                  key={row.invoice}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-[22px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] px-4 py-4"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="flex size-10 items-center justify-center rounded-xl bg-violet-400/10 text-violet-500 dark:text-violet-200">
-                      <Receipt className="size-5" />
+              {isLoading ? (
+                Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-[72px] w-full rounded-[22px]" />
+                ))
+              ) : invoices?.length === 0 ? (
+                <div className="rounded-[22px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] px-4 py-8 text-center">
+                  <p className="text-sm text-[var(--text-tertiary)]">No invoices yet.</p>
+                </div>
+              ) : (
+                invoices?.map((row, index) => (
+                  <motion.div
+                    key={row.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-[22px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] px-4 py-4"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="flex size-10 items-center justify-center rounded-xl bg-violet-400/10 text-violet-500 dark:text-violet-200">
+                        <Receipt className="size-5" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-[var(--heading)]">{row.invoiceNumber}</p>
+                        <p className="text-sm text-[var(--text-tertiary)]">{row.date}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-[var(--heading)]">{row.invoice}</p>
-                      <p className="text-sm text-[var(--text-tertiary)]">{row.date}</p>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="font-medium text-[var(--heading)]">{row.amount}</p>
+                        <p className="text-xs text-emerald-500 dark:text-emerald-400">{row.status}</p>
+                      </div>
+                      <Button variant="ghost" size="icon" onClick={() => toast(`Downloading invoice ${row.invoiceNumber}...`, "success")}>
+                        <Download className="size-4" />
+                      </Button>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="font-medium text-[var(--heading)]">{row.amount}</p>
-                      <p className="text-xs text-emerald-500 dark:text-emerald-400">{row.status}</p>
-                    </div>
-                    <Button variant="ghost" size="icon" onClick={() => toast(`Downloading invoice ${row.invoice}...`, "success")}>
-                      <Download className="size-4" />
-                    </Button>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))
+              )}
             </div>
           </Card>
         </div>

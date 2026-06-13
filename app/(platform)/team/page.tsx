@@ -7,9 +7,14 @@ import { TeamCard } from "@/components/cards/team-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { teamMembers } from "@/data/mock-data";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/components/ui/toast";
+import { useTeamMembers } from "@/hooks/use-team";
 
 export default function TeamPage() {
+  const { data: teamMembers, isLoading } = useTeamMembers();
+  const { toast } = useToast();
+
   return (
     <div className="space-y-6 pb-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -17,23 +22,32 @@ export default function TeamPage() {
           <h1 className="text-3xl font-semibold text-[var(--heading)]">Team</h1>
           <p className="text-sm text-[var(--text-secondary)]">Manage your agency members and permissions.</p>
         </div>
-        <Button>
+        <Button onClick={() => toast("Add member modal coming soon!", "info")}>
           <Plus className="size-4" />
           Add Member
         </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {teamMembers.map((member, index) => (
-          <motion.div
-            key={member.name}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <TeamCard {...member} />
-          </motion.div>
-        ))}
+        {isLoading
+          ? Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-[160px] w-full rounded-[28px]" />
+            ))
+          : teamMembers?.map((member, index) => (
+              <motion.div
+                key={member.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <TeamCard
+                  name={member.name}
+                  role={member.role}
+                  status={member.status}
+                  initials={member.initials}
+                />
+              </motion.div>
+            ))}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -73,7 +87,7 @@ export default function TeamPage() {
           <div className="space-y-4">
             <div className="flex gap-3">
               <Input placeholder="name@agency.com" className="flex-1" />
-              <Button>Send Invite</Button>
+              <Button onClick={() => toast("Invite sent!", "success")}>Send Invite</Button>
             </div>
             <div className="rounded-[22px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] px-4 py-8 text-center">
               <p className="text-sm text-[var(--text-tertiary)]">No pending invitations.</p>

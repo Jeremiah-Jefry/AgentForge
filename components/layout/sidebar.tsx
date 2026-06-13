@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, CreditCard, Home, Settings, Users2, X } from "lucide-react";
+import { BarChart3, CreditCard, Home, LogOut, Settings, Users2, X } from "lucide-react";
 import { motion } from "framer-motion";
+import { signOut } from "next-auth/react";
 
-import { navItems } from "@/data/mock-data";
+import { navItems } from "@/data/static-data";
 import { useWorkspace } from "@/components/providers/workspace-provider";
+import { useCurrentSession } from "@/hooks/use-session";
 import { cn } from "@/lib/utils";
 
 const icons = [Home, Users2, CreditCard, BarChart3, Settings];
@@ -14,6 +16,7 @@ const icons = [Home, Users2, CreditCard, BarChart3, Settings];
 export function Sidebar({ mobile = false }: { mobile?: boolean }) {
   const pathname = usePathname();
   const { setSidebarOpen } = useWorkspace();
+  const { user } = useCurrentSession();
 
   const content = (
     <div className="flex h-full flex-col gap-8 rounded-[28px] border border-[var(--border)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.32)] backdrop-blur-2xl" style={{ background: "var(--sidebar-gradient)" }}>
@@ -57,11 +60,22 @@ export function Sidebar({ mobile = false }: { mobile?: boolean }) {
         })}
       </nav>
 
-      <div className="mt-auto rounded-[24px] border border-cyan-400/15 bg-cyan-400/10 p-4">
-        <p className="text-xs uppercase tracking-[0.22em] text-cyan-600 dark:text-cyan-200">Automation</p>
-        <p className="mt-3 text-sm leading-6 text-[var(--text-primary)]">
-          8 overdue reminders and 3 billing nudges scheduled for today.
-        </p>
+      <div className="mt-auto space-y-4">
+        {user ? (
+          <div className="rounded-[24px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] p-4">
+            <p className="font-medium text-[var(--heading)]">{user.name}</p>
+            <p className="text-xs text-[var(--text-tertiary)]">{user.email}</p>
+            <p className="mt-1 text-xs capitalize text-[var(--text-secondary)]">{user.role.toLowerCase()}</p>
+          </div>
+        ) : null}
+        <button
+          type="button"
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm text-[var(--text-secondary)] transition hover:bg-[var(--card-inner-bg)] hover:text-[var(--heading)]"
+        >
+          <LogOut className="size-4" />
+          <span>Sign out</span>
+        </button>
       </div>
     </div>
   );

@@ -4,12 +4,43 @@ import { Bell } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
-import { useWorkspace } from "@/components/providers/workspace-provider";
 import { Button } from "@/components/ui/button";
+
+type NotificationItem = {
+  id: number;
+  title: string;
+  detail: string;
+  time: string;
+  unread: boolean;
+};
+
+const initialNotifications: NotificationItem[] = [
+  {
+    id: 1,
+    title: "Orbit Labs renewed their retainer",
+    detail: "A $12.4k annual contract was approved by finance.",
+    time: "2 min ago",
+    unread: true,
+  },
+  {
+    id: 2,
+    title: "Launch review moved forward",
+    detail: "Northline requested an accelerated stakeholder demo.",
+    time: "11 min ago",
+    unread: true,
+  },
+  {
+    id: 3,
+    title: "Automation rule executed",
+    detail: "Billing reminders were sent to 8 pending accounts.",
+    time: "38 min ago",
+    unread: false,
+  },
+];
 
 export function NotificationDropdown() {
   const [open, setOpen] = useState(false);
-  const { notifications, setNotifications } = useWorkspace();
+  const [notifications, setNotifications] = useState(initialNotifications);
   const unread = notifications.filter((item) => item.unread).length;
   const containerRef = useRef<HTMLDivElement>(null);
 

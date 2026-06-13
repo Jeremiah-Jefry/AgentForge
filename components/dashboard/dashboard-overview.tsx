@@ -8,14 +8,11 @@ import { RevenueChart } from "@/components/charts/revenue-chart";
 import { TaskBoard } from "@/components/dashboard/task-board";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  activities,
-  billingRows,
-  clientTable,
-  dashboardStats,
-  revenueSeries,
-  teamMembers,
-} from "@/data/mock-data";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useDashboardStats, useActivities } from "@/hooks/use-dashboard";
+import { useClients } from "@/hooks/use-clients";
+import { useInvoices } from "@/hooks/use-invoices";
+import { useTeamMembers } from "@/hooks/use-team";
 
 const cards = [
   { icon: TrendingUp, title: "Revenue analytics", description: "Signal-rich growth tracking" },
@@ -25,27 +22,37 @@ const cards = [
 ];
 
 export function DashboardOverview() {
+  const { data: stats, isLoading: statsLoading } = useDashboardStats();
+  const { data: activities, isLoading: activitiesLoading } = useActivities();
+  const { data: clients, isLoading: clientsLoading } = useClients();
+  const { data: invoices, isLoading: invoicesLoading } = useInvoices();
+  const { data: teamMembers, isLoading: teamLoading } = useTeamMembers();
+
   return (
     <div className="space-y-4 pb-6">
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {dashboardStats.map((stat, index) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: index * 0.08 }}
-          >
-            <Card className="overflow-hidden">
-              <div className="text-sm text-[var(--text-tertiary)]">{stat.label}</div>
-              <div className="mt-5 flex items-end justify-between gap-3">
-                <div className="text-3xl font-semibold text-[var(--heading)]">{stat.value}</div>
-                <Badge variant={stat.delta.startsWith("-") ? "warning" : "success"}>
-                  {stat.delta}
-                </Badge>
-              </div>
-            </Card>
-          </motion.div>
-        ))}
+        {statsLoading
+          ? Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-[120px] w-full rounded-[28px]" />
+            ))
+          : stats?.map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: index * 0.08 }}
+              >
+                <Card className="overflow-hidden">
+                  <div className="text-sm text-[var(--text-tertiary)]">{stat.label}</div>
+                  <div className="mt-5 flex items-end justify-between gap-3">
+                    <div className="text-3xl font-semibold text-[var(--heading)]">{stat.value}</div>
+                    <Badge variant={stat.delta.startsWith("-") ? "warning" : "success"}>
+                      {stat.delta}
+                    </Badge>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[1.25fr_0.75fr]">
@@ -91,15 +98,23 @@ export function DashboardOverview() {
                 </tr>
               </thead>
               <tbody>
-                {clientTable.map((client) => (
-                  <tr key={client.name} className="border-t border-[var(--card-inner-border)] text-[var(--text-secondary)]">
-                    <td className="px-4 py-4 text-[var(--heading)]">{client.name}</td>
-                    <td className="px-4 py-4">{client.project}</td>
-                    <td className="px-4 py-4">{client.stage}</td>
-                    <td className="px-4 py-4">{client.payment}</td>
-                    <td className="px-4 py-4">{client.performance}</td>
+                {clientsLoading ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-8 text-center text-[var(--text-tertiary)]">
+                      Loading clients...
+                    </td>
                   </tr>
-                ))}
+                ) : (
+                  clients?.map((client) => (
+                    <tr key={client.id} className="border-t border-[var(--card-inner-border)] text-[var(--text-secondary)]">
+                      <td className="px-4 py-4 text-[var(--heading)]">{client.name}</td>
+                      <td className="px-4 py-4">{client.project}</td>
+                      <td className="px-4 py-4">{client.stage}</td>
+                      <td className="px-4 py-4">{client.payment}</td>
+                      <td className="px-4 py-4">{client.performance}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -112,19 +127,25 @@ export function DashboardOverview() {
             </div>
           </CardHeader>
           <div className="space-y-4">
-            {activities.map((item) => (
-              <div key={item.title} className="rounded-[22px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-medium text-[var(--heading)]">{item.title}</p>
-                    <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{item.detail}</p>
+            {activitiesLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-[80px] w-full rounded-[22px]" />
+              ))
+            ) : (
+              activities?.map((item) => (
+                <div key={item.id} className="rounded-[22px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-medium text-[var(--heading)]">{item.title}</p>
+                      <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{item.detail}</p>
+                    </div>
+                    <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+                      {item.time}
+                    </span>
                   </div>
-                  <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
-                    {item.time}
-                  </span>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </Card>
       </section>
@@ -134,7 +155,7 @@ export function DashboardOverview() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-xl font-semibold text-[var(--heading)]">Task board</h3>
-              <p className="text-sm text-[var(--text-secondary)]">Drag-style workflow movement with local persistence.</p>
+              <p className="text-sm text-[var(--text-secondary)]">Drag-style workflow movement with database persistence.</p>
             </div>
             <Badge variant="violet">Sprint</Badge>
           </div>
@@ -180,21 +201,27 @@ export function DashboardOverview() {
               </div>
             </CardHeader>
             <div className="space-y-3">
-              {billingRows.slice(0, 3).map((row) => (
-                <div
-                  key={row.invoice}
-                  className="flex items-center justify-between rounded-[22px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] px-4 py-3"
-                >
-                  <div>
-                    <p className="font-medium text-[var(--heading)]">{row.invoice}</p>
-                    <p className="text-xs text-[var(--text-tertiary)]">{row.date}</p>
+              {invoicesLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-[64px] w-full rounded-[22px]" />
+                ))
+              ) : (
+                invoices?.slice(0, 3).map((row) => (
+                  <div
+                    key={row.id}
+                    className="flex items-center justify-between rounded-[22px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] px-4 py-3"
+                  >
+                    <div>
+                      <p className="font-medium text-[var(--heading)]">{row.invoiceNumber}</p>
+                      <p className="text-xs text-[var(--text-tertiary)]">{row.date}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-[var(--heading)]">{row.amount}</p>
+                      <p className="text-xs text-[var(--text-tertiary)]">{row.status}</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-[var(--heading)]">{row.amount}</p>
-                    <p className="text-xs text-[var(--text-tertiary)]">{row.status}</p>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </Card>
           <Card>
@@ -205,18 +232,24 @@ export function DashboardOverview() {
               </div>
             </CardHeader>
             <div className="space-y-3">
-              {teamMembers.slice(0, 3).map((member) => (
-                <div
-                  key={member.name}
-                  className="flex items-center justify-between rounded-[22px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] px-4 py-3"
-                >
-                  <div>
-                    <p className="font-medium text-[var(--heading)]">{member.name}</p>
-                    <p className="text-xs text-[var(--text-tertiary)]">{member.role}</p>
+              {teamLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-[64px] w-full rounded-[22px]" />
+                ))
+              ) : (
+                teamMembers?.slice(0, 3).map((member) => (
+                  <div
+                    key={member.id}
+                    className="flex items-center justify-between rounded-[22px] border border-[var(--card-inner-border)] bg-[var(--card-inner-bg)] px-4 py-3"
+                  >
+                    <div>
+                      <p className="font-medium text-[var(--heading)]">{member.name}</p>
+                      <p className="text-xs text-[var(--text-tertiary)]">{member.role}</p>
+                    </div>
+                    <CheckCircle2 className="size-4 text-emerald-500 dark:text-emerald-300" />
                   </div>
-                  <CheckCircle2 className="size-4 text-emerald-500 dark:text-emerald-300" />
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </Card>
         </div>
@@ -233,12 +266,7 @@ export function DashboardOverview() {
             <div className="h-2 rounded-full bg-[var(--card-inner-bg)]">
               <div
                 className="h-full rounded-full bg-[linear-gradient(90deg,#5b8cff,#33d1ff)]"
-                style={{
-                  width: `${Math.max(
-                    42,
-                    Math.min(94, Math.round((revenueSeries.at(-1)?.revenue ?? 50_000) / 1000)),
-                  )}%`,
-                }}
+                style={{ width: `${Math.max(42, Math.min(94, 82))}%` }}
               />
             </div>
           </Card>
