@@ -9,6 +9,7 @@ export default defineConfig({
       const { PrismaBetterSQLite } = await import("@prisma/adapter-better-sqlite3");
       return new PrismaBetterSQLite({ url: "file:prisma/dev.db" });
     },
+    seed: "npx tsx prisma/seed.ts",
   },
   datasource: {
     url: "file:prisma/dev.db",
