@@ -2,16 +2,22 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { otpSchema, type OtpValues } from "@/lib/validation";
 
 export default function OtpVerificationPage() {
   const router = useRouter();
+  const form = useForm<OtpValues>({
+    resolver: zodResolver(otpSchema),
+    defaultValues: { code: "" },
+  });
 
-  const handleVerify = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleVerify = (_values: OtpValues) => {
     router.push("/dashboard");
   };
 
@@ -28,18 +34,34 @@ export default function OtpVerificationPage() {
         </div>
       }
     >
-      <form onSubmit={handleVerify} className="space-y-6">
-        <div className="flex justify-between gap-2">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Input
-              key={i}
-              className="h-12 w-12 text-center text-lg md:h-14 md:w-14"
-              maxLength={1}
-              required
-            />
-          ))}
+      <form onSubmit={form.handleSubmit(handleVerify)} className="space-y-6" noValidate>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-[var(--heading)]" htmlFor="code">
+            Verification code
+          </label>
+          <Input
+            id="code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            placeholder="123456"
+            maxLength={6}
+            {...form.register("code")}
+            aria-invalid={!!form.formState.errors.code}
+            className={[
+              "text-center text-lg tracking-[0.35em]",
+              form.formState.errors.code ? "border-red-400/40 focus:border-red-400 focus:ring-red-400/20" : null,
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          />
+          <p className="text-xs text-[var(--text-tertiary)]">
+            Enter the 6-digit code from your inbox.
+          </p>
+          {form.formState.errors.code ? (
+            <p className="text-xs text-red-400">{form.formState.errors.code.message}</p>
+          ) : null}
         </div>
-        <Button className="w-full" type="submit">
+        <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
           Verify
         </Button>
       </form>

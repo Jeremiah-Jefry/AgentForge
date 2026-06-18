@@ -2,14 +2,16 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 import { registerUser } from "@/lib/actions/auth";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
+import { signupSchema, type SignupValues } from "@/lib/validation";
 
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -25,41 +27,32 @@ const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const form = useForm<SignupValues>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+    },
+  });
 
-  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    const formData = new FormData(e.currentTarget);
-    const firstName = formData.get("firstName") as string;
-    const lastName = formData.get("lastName") as string;
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      setLoading(false);
-      return;
-    }
-
+  const handleSignup = async (values: SignupValues) => {
     try {
       const result = await registerUser({
-        email,
-        password,
-        name: `${firstName} ${lastName}`.trim(),
+        email: values.email,
+        password: values.password,
+        name: `${values.firstName} ${values.lastName}`.trim(),
       });
 
       if ("error" in result && result.error) {
-        setError(result.error);
+        form.setError("root", { message: result.error });
         toast(result.error, "error");
       } else {
         // Auto sign-in after registration
         const signInResult = await signIn("credentials", {
-          email,
-          password,
+          email: values.email,
+          password: values.password,
           redirect: false,
         });
 
@@ -73,10 +66,8 @@ export default function SignupPage() {
         }
       }
     } catch {
-      setError("Something went wrong. Please try again.");
+      form.setError("root", { message: "Something went wrong. Please try again." });
       toast("An unexpected error occurred.", "error");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -97,10 +88,10 @@ export default function SignupPage() {
         </div>
       }
     >
-      <form onSubmit={handleSignup} className="space-y-4">
-        {error ? (
+      <form onSubmit={form.handleSubmit(handleSignup)} className="space-y-4" noValidate>
+        {form.formState.errors.root ? (
           <div className="rounded-xl border border-red-400/25 bg-red-400/8 px-4 py-3 text-sm text-red-400">
-            {error}
+            {form.formState.errors.root.message}
           </div>
         ) : null}
         <div className="grid gap-4 md:grid-cols-2">
@@ -108,29 +99,67 @@ export default function SignupPage() {
             <label className="text-sm font-medium text-[var(--heading)]" htmlFor="firstName">
               First name
             </label>
-            <Input id="firstName" name="firstName" required />
+            <Input
+              id="firstName"
+              placeholder="Alex"
+              {...form.register("firstName")}
+              aria-invalid={!!form.formState.errors.firstName}
+              className={form.formState.errors.firstName ? "border-red-400/40 focus:border-red-400 focus:ring-red-400/20" : undefined}
+            />
+            {form.formState.errors.firstName ? (
+              <p className="text-xs text-red-400">{form.formState.errors.firstName.message}</p>
+            ) : null}
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium text-[var(--heading)]" htmlFor="lastName">
               Last name
             </label>
-            <Input id="lastName" name="lastName" required />
+            <Input
+              id="lastName"
+              placeholder="Johnson"
+              {...form.register("lastName")}
+              aria-invalid={!!form.formState.errors.lastName}
+              className={form.formState.errors.lastName ? "border-red-400/40 focus:border-red-400 focus:ring-red-400/20" : undefined}
+            />
+            {form.formState.errors.lastName ? (
+              <p className="text-xs text-red-400">{form.formState.errors.lastName.message}</p>
+            ) : null}
           </div>
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium text-[var(--heading)]" htmlFor="email">
             Email
           </label>
-          <Input id="email" name="email" type="email" placeholder="name@agency.com" required />
+          <Input
+            id="email"
+            type="email"
+            placeholder="name@agency.com"
+            {...form.register("email")}
+            aria-invalid={!!form.formState.errors.email}
+            className={form.formState.errors.email ? "border-red-400/40 focus:border-red-400 focus:ring-red-400/20" : undefined}
+          />
+          {form.formState.errors.email ? (
+            <p className="text-xs text-red-400">{form.formState.errors.email.message}</p>
+          ) : null}
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium text-[var(--heading)]" htmlFor="password">
             Password
           </label>
-          <Input id="password" name="password" type="password" placeholder="Min 6 characters" required />
+          <Input
+            id="password"
+            type="password"
+            placeholder="Min 6 characters"
+            {...form.register("password")}
+            aria-invalid={!!form.formState.errors.password}
+            className={form.formState.errors.password ? "border-red-400/40 focus:border-red-400 focus:ring-red-400/20" : undefined}
+          />
+          {form.formState.errors.password ? (
+            <p className="text-xs text-red-400">{form.formState.errors.password.message}</p>
+          ) : null}
         </div>
-        <Button className="w-full" type="submit" disabled={loading}>
-          {loading ? "Creating account..." : "Start free"}
+        <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? "Creating account..." : "Start free"}
         </Button>
       </form>
 

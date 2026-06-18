@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
+import { loginSchema, type LoginValues } from "@/lib/validation";
 
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -24,27 +26,22 @@ const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const form = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
+  const handleLogin = async (values: LoginValues) => {
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
+      const result = await signIn("credentials", { ...values, redirect: false });
 
       if (result?.error) {
-        setError("Invalid email or password. Try alex@vexorium.com / password123");
+        form.setError("root", {
+          message: "Invalid email or password. Try alex@vexorium.com / password123",
+        });
         toast("Login failed. Please check your credentials.", "error");
       } else {
         toast("Welcome back!", "success");
@@ -52,10 +49,8 @@ export default function LoginPage() {
         router.refresh();
       }
     } catch {
-      setError("Something went wrong. Please try again.");
+      form.setError("root", { message: "Something went wrong. Please try again." });
       toast("An unexpected error occurred.", "error");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -76,17 +71,27 @@ export default function LoginPage() {
         </div>
       }
     >
-      <form onSubmit={handleLogin} className="space-y-4">
-        {error ? (
+      <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4" noValidate>
+        {form.formState.errors.root ? (
           <div className="rounded-xl border border-red-400/25 bg-red-400/8 px-4 py-3 text-sm text-red-400">
-            {error}
+            {form.formState.errors.root.message}
           </div>
         ) : null}
         <div className="space-y-2">
           <label className="text-sm font-medium text-[var(--heading)]" htmlFor="email">
             Email
           </label>
-          <Input id="email" name="email" type="email" placeholder="alex@vexorium.com" required />
+          <Input
+            id="email"
+            type="email"
+            placeholder="alex@vexorium.com"
+            {...form.register("email")}
+            aria-invalid={!!form.formState.errors.email}
+            className={form.formState.errors.email ? "border-red-400/40 focus:border-red-400 focus:ring-red-400/20" : undefined}
+          />
+          {form.formState.errors.email ? (
+            <p className="text-xs text-red-400">{form.formState.errors.email.message}</p>
+          ) : null}
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
@@ -100,10 +105,20 @@ export default function LoginPage() {
               Forgot password?
             </Link>
           </div>
-          <Input id="password" name="password" type="password" placeholder="password123" required />
+          <Input
+            id="password"
+            type="password"
+            placeholder="password123"
+            {...form.register("password")}
+            aria-invalid={!!form.formState.errors.password}
+            className={form.formState.errors.password ? "border-red-400/40 focus:border-red-400 focus:ring-red-400/20" : undefined}
+          />
+          {form.formState.errors.password ? (
+            <p className="text-xs text-red-400">{form.formState.errors.password.message}</p>
+          ) : null}
         </div>
-        <Button className="w-full" type="submit" disabled={loading}>
-          {loading ? "Signing in..." : "Login"}
+        <Button className="w-full" type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? "Signing in..." : "Login"}
         </Button>
       </form>
 
