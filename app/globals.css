@@ -174,8 +174,7 @@ input {
 
 .light .glow-ring {
   box-shadow: 0 0 0 1px rgba(51, 209, 255, 0.12), 0 0 20px rgba(51, 209, 255, 0.08);
-}
-
+}ð
 .text-gradient {
   background: linear-gradient(135deg, #fff 10%, #8db7ff 45%, #b99cff 80%, #7ef0ff 100%);
   -webkit-background-clip: text;
